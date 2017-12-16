@@ -106,30 +106,19 @@ pub enum napi_status {
     napi_pending_exception = 10,
     napi_cancelled = 11,
     napi_escape_called_twice = 12,
+    napi_handle_scope_mismatch = 13,
 }
-pub type napi_callback = ::std::option::Option<
-    unsafe extern "C" fn(env: napi_env, info: napi_callback_info)
-        -> napi_value,
->;
-pub type napi_finalize = ::std::option::Option<
-    unsafe extern "C" fn(
-        env: napi_env,
-        finalize_data: *mut ::std::os::raw::c_void,
-        finalize_hint: *mut ::std::os::raw::c_void,
-    ),
->;
-pub type napi_async_execute_callback = ::std::option::Option<
-    unsafe extern "C" fn(env: napi_env, data: *mut ::std::os::raw::c_void),
->;
-pub type napi_async_complete_callback = ::std::option::Option<
-    unsafe extern "C" fn(
-        env: napi_env,
-        status: napi_status,
-        data: *mut ::std::os::raw::c_void,
-    ),
->;
+pub type napi_callback =
+    ::std::option::Option<
+        unsafe extern "C" fn(env: napi_env,
+                             info: napi_callback_info)
+                             -> napi_value,
+    >;
+pub type napi_finalize = :: std :: option :: Option < unsafe extern "C" fn ( env : napi_env , finalize_data : * mut :: std :: os :: raw :: c_void , finalize_hint : * mut :: std :: os :: raw :: c_void ) > ;
+pub type napi_async_execute_callback = :: std :: option :: Option < unsafe extern "C" fn ( env : napi_env , data : * mut :: std :: os :: raw :: c_void ) > ;
+pub type napi_async_complete_callback = :: std :: option :: Option < unsafe extern "C" fn ( env : napi_env , status : napi_status , data : * mut :: std :: os :: raw :: c_void ) > ;
 #[repr(C)]
-#[derive(Debug, Copy)]
+#[derive(Debug, Copy, Clone)]
 pub struct napi_property_descriptor {
     pub utf8name: *const ::std::os::raw::c_char,
     pub name: napi_value,
@@ -154,12 +143,12 @@ fn bindgen_test_layout_napi_property_descriptor() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_property_descriptor)).utf8name as *const _
-                as usize
+            &(*(::std::ptr::null::<napi_property_descriptor>()))
+                .utf8name as *const _ as usize
         },
         0usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_property_descriptor),
             "::",
             stringify!(utf8name)
@@ -167,11 +156,12 @@ fn bindgen_test_layout_napi_property_descriptor() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_property_descriptor)).name as *const _ as usize
+            &(*(::std::ptr::null::<napi_property_descriptor>())).name as
+                *const _ as usize
         },
         8usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_property_descriptor),
             "::",
             stringify!(name)
@@ -179,12 +169,12 @@ fn bindgen_test_layout_napi_property_descriptor() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_property_descriptor)).method as *const _
-                as usize
+            &(*(::std::ptr::null::<napi_property_descriptor>())).method as
+                *const _ as usize
         },
         16usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_property_descriptor),
             "::",
             stringify!(method)
@@ -192,12 +182,12 @@ fn bindgen_test_layout_napi_property_descriptor() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_property_descriptor)).getter as *const _
-                as usize
+            &(*(::std::ptr::null::<napi_property_descriptor>())).getter as
+                *const _ as usize
         },
         24usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_property_descriptor),
             "::",
             stringify!(getter)
@@ -205,12 +195,12 @@ fn bindgen_test_layout_napi_property_descriptor() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_property_descriptor)).setter as *const _
-                as usize
+            &(*(::std::ptr::null::<napi_property_descriptor>())).setter as
+                *const _ as usize
         },
         32usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_property_descriptor),
             "::",
             stringify!(setter)
@@ -218,12 +208,12 @@ fn bindgen_test_layout_napi_property_descriptor() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_property_descriptor)).value as *const _
-                as usize
+            &(*(::std::ptr::null::<napi_property_descriptor>())).value as
+                *const _ as usize
         },
         40usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_property_descriptor),
             "::",
             stringify!(value)
@@ -231,12 +221,12 @@ fn bindgen_test_layout_napi_property_descriptor() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_property_descriptor)).attributes as *const _
-                as usize
+            &(*(::std::ptr::null::<napi_property_descriptor>()))
+                .attributes as *const _ as usize
         },
         48usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_property_descriptor),
             "::",
             stringify!(attributes)
@@ -244,24 +234,20 @@ fn bindgen_test_layout_napi_property_descriptor() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_property_descriptor)).data as *const _ as usize
+            &(*(::std::ptr::null::<napi_property_descriptor>())).data as
+                *const _ as usize
         },
         56usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_property_descriptor),
             "::",
             stringify!(data)
         )
     );
 }
-impl Clone for napi_property_descriptor {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
 #[repr(C)]
-#[derive(Debug, Copy)]
+#[derive(Debug, Copy, Clone)]
 pub struct napi_extended_error_info {
     pub error_message: *const ::std::os::raw::c_char,
     pub engine_reserved: *mut ::std::os::raw::c_void,
@@ -282,12 +268,12 @@ fn bindgen_test_layout_napi_extended_error_info() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_extended_error_info)).error_message as *const _
-                as usize
+            &(*(::std::ptr::null::<napi_extended_error_info>()))
+                .error_message as *const _ as usize
         },
         0usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_extended_error_info),
             "::",
             stringify!(error_message)
@@ -295,12 +281,12 @@ fn bindgen_test_layout_napi_extended_error_info() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_extended_error_info)).engine_reserved
-                as *const _ as usize
+            &(*(::std::ptr::null::<napi_extended_error_info>()))
+                .engine_reserved as *const _ as usize
         },
         8usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_extended_error_info),
             "::",
             stringify!(engine_reserved)
@@ -308,12 +294,12 @@ fn bindgen_test_layout_napi_extended_error_info() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_extended_error_info)).engine_error_code
-                as *const _ as usize
+            &(*(::std::ptr::null::<napi_extended_error_info>()))
+                .engine_error_code as *const _ as usize
         },
         16usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_extended_error_info),
             "::",
             stringify!(engine_error_code)
@@ -321,25 +307,20 @@ fn bindgen_test_layout_napi_extended_error_info() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_extended_error_info)).error_code as *const _
-                as usize
+            &(*(::std::ptr::null::<napi_extended_error_info>()))
+                .error_code as *const _ as usize
         },
         20usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_extended_error_info),
             "::",
             stringify!(error_code)
         )
     );
 }
-impl Clone for napi_extended_error_info {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
 #[repr(C)]
-#[derive(Debug, Copy)]
+#[derive(Debug, Copy, Clone)]
 pub struct napi_node_version {
     pub major: u32,
     pub minor: u32,
@@ -360,11 +341,12 @@ fn bindgen_test_layout_napi_node_version() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_node_version)).major as *const _ as usize
+            &(*(::std::ptr::null::<napi_node_version>())).major as *const _ as
+                usize
         },
         0usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_node_version),
             "::",
             stringify!(major)
@@ -372,11 +354,12 @@ fn bindgen_test_layout_napi_node_version() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_node_version)).minor as *const _ as usize
+            &(*(::std::ptr::null::<napi_node_version>())).minor as *const _ as
+                usize
         },
         4usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_node_version),
             "::",
             stringify!(minor)
@@ -384,11 +367,12 @@ fn bindgen_test_layout_napi_node_version() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_node_version)).patch as *const _ as usize
+            &(*(::std::ptr::null::<napi_node_version>())).patch as *const _ as
+                usize
         },
         8usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_node_version),
             "::",
             stringify!(patch)
@@ -396,28 +380,26 @@ fn bindgen_test_layout_napi_node_version() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_node_version)).release as *const _ as usize
+            &(*(::std::ptr::null::<napi_node_version>())).release as
+                *const _ as usize
         },
         16usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_node_version),
             "::",
             stringify!(release)
         )
     );
 }
-impl Clone for napi_node_version {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-pub type napi_addon_register_func = ::std::option::Option<
-    unsafe extern "C" fn(env: napi_env, exports: napi_value)
-        -> napi_value,
->;
+pub type napi_addon_register_func =
+    ::std::option::Option<
+        unsafe extern "C" fn(env: napi_env,
+                             exports: napi_value)
+                             -> napi_value,
+    >;
 #[repr(C)]
-#[derive(Debug, Copy)]
+#[derive(Debug, Copy, Clone)]
 pub struct napi_module {
     pub nm_version: ::std::os::raw::c_int,
     pub nm_flags: ::std::os::raw::c_uint,
@@ -441,21 +423,25 @@ fn bindgen_test_layout_napi_module() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_module)).nm_version as *const _ as usize
+            &(*(::std::ptr::null::<napi_module>())).nm_version as *const _ as
+                usize
         },
         0usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_module),
             "::",
             stringify!(nm_version)
         )
     );
     assert_eq!(
-        unsafe { &(*(0 as *const napi_module)).nm_flags as *const _ as usize },
+        unsafe {
+            &(*(::std::ptr::null::<napi_module>())).nm_flags as *const _ as
+                usize
+        },
         4usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_module),
             "::",
             stringify!(nm_flags)
@@ -463,11 +449,12 @@ fn bindgen_test_layout_napi_module() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_module)).nm_filename as *const _ as usize
+            &(*(::std::ptr::null::<napi_module>())).nm_filename as *const _ as
+                usize
         },
         8usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_module),
             "::",
             stringify!(nm_filename)
@@ -475,11 +462,12 @@ fn bindgen_test_layout_napi_module() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_module)).nm_register_func as *const _ as usize
+            &(*(::std::ptr::null::<napi_module>())).nm_register_func as
+                *const _ as usize
         },
         16usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_module),
             "::",
             stringify!(nm_register_func)
@@ -487,52 +475,56 @@ fn bindgen_test_layout_napi_module() {
     );
     assert_eq!(
         unsafe {
-            &(*(0 as *const napi_module)).nm_modname as *const _ as usize
+            &(*(::std::ptr::null::<napi_module>())).nm_modname as *const _ as
+                usize
         },
         24usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_module),
             "::",
             stringify!(nm_modname)
         )
     );
     assert_eq!(
-        unsafe { &(*(0 as *const napi_module)).nm_priv as *const _ as usize },
+        unsafe {
+            &(*(::std::ptr::null::<napi_module>())).nm_priv as *const _ as usize
+        },
         32usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_module),
             "::",
             stringify!(nm_priv)
         )
     );
     assert_eq!(
-        unsafe { &(*(0 as *const napi_module)).reserved as *const _ as usize },
+        unsafe {
+            &(*(::std::ptr::null::<napi_module>())).reserved as *const _ as
+                usize
+        },
         40usize,
         concat!(
-            "Alignment of field: ",
+            "Offset of field: ",
             stringify!(napi_module),
             "::",
             stringify!(reserved)
         )
     );
 }
-impl Clone for napi_module {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
 extern "C" {
+ # [ link_name = "\u{1}_napi_module_register" ]
     pub fn napi_module_register(mod_: *mut napi_module);
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_last_error_info" ]
     pub fn napi_get_last_error_info(
         env: napi_env,
         result: *mut *const napi_extended_error_info,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_fatal_error" ]
     pub fn napi_fatal_error(
         location: *const ::std::os::raw::c_char,
         location_len: usize,
@@ -541,22 +533,26 @@ extern "C" {
     );
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_undefined" ]
     pub fn napi_get_undefined(
         env: napi_env,
         result: *mut napi_value,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_null" ]
     pub fn napi_get_null(env: napi_env, result: *mut napi_value)
         -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_global" ]
     pub fn napi_get_global(
         env: napi_env,
         result: *mut napi_value,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_boolean" ]
     pub fn napi_get_boolean(
         env: napi_env,
         value: bool,
@@ -564,18 +560,21 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_object" ]
     pub fn napi_create_object(
         env: napi_env,
         result: *mut napi_value,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_array" ]
     pub fn napi_create_array(
         env: napi_env,
         result: *mut napi_value,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_array_with_length" ]
     pub fn napi_create_array_with_length(
         env: napi_env,
         length: usize,
@@ -583,6 +582,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_double" ]
     pub fn napi_create_double(
         env: napi_env,
         value: f64,
@@ -590,6 +590,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_int32" ]
     pub fn napi_create_int32(
         env: napi_env,
         value: i32,
@@ -597,6 +598,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_uint32" ]
     pub fn napi_create_uint32(
         env: napi_env,
         value: u32,
@@ -604,6 +606,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_int64" ]
     pub fn napi_create_int64(
         env: napi_env,
         value: i64,
@@ -611,6 +614,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_string_latin1" ]
     pub fn napi_create_string_latin1(
         env: napi_env,
         str: *const ::std::os::raw::c_char,
@@ -619,6 +623,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_string_utf8" ]
     pub fn napi_create_string_utf8(
         env: napi_env,
         str: *const ::std::os::raw::c_char,
@@ -627,6 +632,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_string_utf16" ]
     pub fn napi_create_string_utf16(
         env: napi_env,
         str: *const char16_t,
@@ -635,6 +641,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_symbol" ]
     pub fn napi_create_symbol(
         env: napi_env,
         description: napi_value,
@@ -642,6 +649,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_function" ]
     pub fn napi_create_function(
         env: napi_env,
         utf8name: *const ::std::os::raw::c_char,
@@ -652,6 +660,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_error" ]
     pub fn napi_create_error(
         env: napi_env,
         code: napi_value,
@@ -660,6 +669,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_type_error" ]
     pub fn napi_create_type_error(
         env: napi_env,
         code: napi_value,
@@ -668,6 +678,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_range_error" ]
     pub fn napi_create_range_error(
         env: napi_env,
         code: napi_value,
@@ -676,6 +687,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_typeof" ]
     pub fn napi_typeof(
         env: napi_env,
         value: napi_value,
@@ -683,6 +695,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_value_double" ]
     pub fn napi_get_value_double(
         env: napi_env,
         value: napi_value,
@@ -690,6 +703,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_value_int32" ]
     pub fn napi_get_value_int32(
         env: napi_env,
         value: napi_value,
@@ -697,6 +711,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_value_uint32" ]
     pub fn napi_get_value_uint32(
         env: napi_env,
         value: napi_value,
@@ -704,6 +719,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_value_int64" ]
     pub fn napi_get_value_int64(
         env: napi_env,
         value: napi_value,
@@ -711,6 +727,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_value_bool" ]
     pub fn napi_get_value_bool(
         env: napi_env,
         value: napi_value,
@@ -718,6 +735,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_value_string_latin1" ]
     pub fn napi_get_value_string_latin1(
         env: napi_env,
         value: napi_value,
@@ -727,6 +745,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_value_string_utf8" ]
     pub fn napi_get_value_string_utf8(
         env: napi_env,
         value: napi_value,
@@ -736,6 +755,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_value_string_utf16" ]
     pub fn napi_get_value_string_utf16(
         env: napi_env,
         value: napi_value,
@@ -745,6 +765,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_coerce_to_bool" ]
     pub fn napi_coerce_to_bool(
         env: napi_env,
         value: napi_value,
@@ -752,6 +773,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_coerce_to_number" ]
     pub fn napi_coerce_to_number(
         env: napi_env,
         value: napi_value,
@@ -759,6 +781,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_coerce_to_object" ]
     pub fn napi_coerce_to_object(
         env: napi_env,
         value: napi_value,
@@ -766,6 +789,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_coerce_to_string" ]
     pub fn napi_coerce_to_string(
         env: napi_env,
         value: napi_value,
@@ -773,6 +797,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_prototype" ]
     pub fn napi_get_prototype(
         env: napi_env,
         object: napi_value,
@@ -780,6 +805,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_property_names" ]
     pub fn napi_get_property_names(
         env: napi_env,
         object: napi_value,
@@ -787,6 +813,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_set_property" ]
     pub fn napi_set_property(
         env: napi_env,
         object: napi_value,
@@ -795,6 +822,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_has_property" ]
     pub fn napi_has_property(
         env: napi_env,
         object: napi_value,
@@ -803,6 +831,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_property" ]
     pub fn napi_get_property(
         env: napi_env,
         object: napi_value,
@@ -811,6 +840,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_delete_property" ]
     pub fn napi_delete_property(
         env: napi_env,
         object: napi_value,
@@ -819,6 +849,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_has_own_property" ]
     pub fn napi_has_own_property(
         env: napi_env,
         object: napi_value,
@@ -827,6 +858,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_set_named_property" ]
     pub fn napi_set_named_property(
         env: napi_env,
         object: napi_value,
@@ -835,6 +867,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_has_named_property" ]
     pub fn napi_has_named_property(
         env: napi_env,
         object: napi_value,
@@ -843,6 +876,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_named_property" ]
     pub fn napi_get_named_property(
         env: napi_env,
         object: napi_value,
@@ -851,6 +885,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_set_element" ]
     pub fn napi_set_element(
         env: napi_env,
         object: napi_value,
@@ -859,6 +894,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_has_element" ]
     pub fn napi_has_element(
         env: napi_env,
         object: napi_value,
@@ -867,6 +903,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_element" ]
     pub fn napi_get_element(
         env: napi_env,
         object: napi_value,
@@ -875,6 +912,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_delete_element" ]
     pub fn napi_delete_element(
         env: napi_env,
         object: napi_value,
@@ -883,6 +921,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_define_properties" ]
     pub fn napi_define_properties(
         env: napi_env,
         object: napi_value,
@@ -891,6 +930,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_is_array" ]
     pub fn napi_is_array(
         env: napi_env,
         value: napi_value,
@@ -898,6 +938,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_array_length" ]
     pub fn napi_get_array_length(
         env: napi_env,
         value: napi_value,
@@ -905,6 +946,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_strict_equals" ]
     pub fn napi_strict_equals(
         env: napi_env,
         lhs: napi_value,
@@ -913,6 +955,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_call_function" ]
     pub fn napi_call_function(
         env: napi_env,
         recv: napi_value,
@@ -923,6 +966,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_new_instance" ]
     pub fn napi_new_instance(
         env: napi_env,
         constructor: napi_value,
@@ -932,6 +976,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_instanceof" ]
     pub fn napi_instanceof(
         env: napi_env,
         object: napi_value,
@@ -940,6 +985,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_cb_info" ]
     pub fn napi_get_cb_info(
         env: napi_env,
         cbinfo: napi_callback_info,
@@ -950,6 +996,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_new_target" ]
     pub fn napi_get_new_target(
         env: napi_env,
         cbinfo: napi_callback_info,
@@ -957,6 +1004,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_define_class" ]
     pub fn napi_define_class(
         env: napi_env,
         utf8name: *const ::std::os::raw::c_char,
@@ -969,6 +1017,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_wrap" ]
     pub fn napi_wrap(
         env: napi_env,
         js_object: napi_value,
@@ -979,6 +1028,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_unwrap" ]
     pub fn napi_unwrap(
         env: napi_env,
         js_object: napi_value,
@@ -986,6 +1036,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_remove_wrap" ]
     pub fn napi_remove_wrap(
         env: napi_env,
         js_object: napi_value,
@@ -993,6 +1044,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_external" ]
     pub fn napi_create_external(
         env: napi_env,
         data: *mut ::std::os::raw::c_void,
@@ -1002,6 +1054,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_value_external" ]
     pub fn napi_get_value_external(
         env: napi_env,
         value: napi_value,
@@ -1009,6 +1062,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_reference" ]
     pub fn napi_create_reference(
         env: napi_env,
         value: napi_value,
@@ -1017,9 +1071,11 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_delete_reference" ]
     pub fn napi_delete_reference(env: napi_env, ref_: napi_ref) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_reference_ref" ]
     pub fn napi_reference_ref(
         env: napi_env,
         ref_: napi_ref,
@@ -1027,6 +1083,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_reference_unref" ]
     pub fn napi_reference_unref(
         env: napi_env,
         ref_: napi_ref,
@@ -1034,6 +1091,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_reference_value" ]
     pub fn napi_get_reference_value(
         env: napi_env,
         ref_: napi_ref,
@@ -1041,30 +1099,35 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_open_handle_scope" ]
     pub fn napi_open_handle_scope(
         env: napi_env,
         result: *mut napi_handle_scope,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_close_handle_scope" ]
     pub fn napi_close_handle_scope(
         env: napi_env,
         scope: napi_handle_scope,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_open_escapable_handle_scope" ]
     pub fn napi_open_escapable_handle_scope(
         env: napi_env,
         result: *mut napi_escapable_handle_scope,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_close_escapable_handle_scope" ]
     pub fn napi_close_escapable_handle_scope(
         env: napi_env,
         scope: napi_escapable_handle_scope,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_escape_handle" ]
     pub fn napi_escape_handle(
         env: napi_env,
         scope: napi_escapable_handle_scope,
@@ -1073,9 +1136,11 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_throw" ]
     pub fn napi_throw(env: napi_env, error: napi_value) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_throw_error" ]
     pub fn napi_throw_error(
         env: napi_env,
         code: *const ::std::os::raw::c_char,
@@ -1083,6 +1148,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_throw_type_error" ]
     pub fn napi_throw_type_error(
         env: napi_env,
         code: *const ::std::os::raw::c_char,
@@ -1090,6 +1156,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_throw_range_error" ]
     pub fn napi_throw_range_error(
         env: napi_env,
         code: *const ::std::os::raw::c_char,
@@ -1097,6 +1164,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_is_error" ]
     pub fn napi_is_error(
         env: napi_env,
         value: napi_value,
@@ -1104,18 +1172,21 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_is_exception_pending" ]
     pub fn napi_is_exception_pending(
         env: napi_env,
         result: *mut bool,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_and_clear_last_exception" ]
     pub fn napi_get_and_clear_last_exception(
         env: napi_env,
         result: *mut napi_value,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_buffer" ]
     pub fn napi_create_buffer(
         env: napi_env,
         length: usize,
@@ -1124,6 +1195,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_external_buffer" ]
     pub fn napi_create_external_buffer(
         env: napi_env,
         length: usize,
@@ -1134,6 +1206,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_buffer_copy" ]
     pub fn napi_create_buffer_copy(
         env: napi_env,
         length: usize,
@@ -1143,6 +1216,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_is_buffer" ]
     pub fn napi_is_buffer(
         env: napi_env,
         value: napi_value,
@@ -1150,6 +1224,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_buffer_info" ]
     pub fn napi_get_buffer_info(
         env: napi_env,
         value: napi_value,
@@ -1158,6 +1233,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_is_arraybuffer" ]
     pub fn napi_is_arraybuffer(
         env: napi_env,
         value: napi_value,
@@ -1165,6 +1241,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_arraybuffer" ]
     pub fn napi_create_arraybuffer(
         env: napi_env,
         byte_length: usize,
@@ -1173,6 +1250,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_external_arraybuffer" ]
     pub fn napi_create_external_arraybuffer(
         env: napi_env,
         external_data: *mut ::std::os::raw::c_void,
@@ -1183,6 +1261,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_arraybuffer_info" ]
     pub fn napi_get_arraybuffer_info(
         env: napi_env,
         arraybuffer: napi_value,
@@ -1191,6 +1270,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_is_typedarray" ]
     pub fn napi_is_typedarray(
         env: napi_env,
         value: napi_value,
@@ -1198,6 +1278,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_typedarray" ]
     pub fn napi_create_typedarray(
         env: napi_env,
         type_: napi_typedarray_type,
@@ -1208,6 +1289,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_typedarray_info" ]
     pub fn napi_get_typedarray_info(
         env: napi_env,
         typedarray: napi_value,
@@ -1219,6 +1301,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_dataview" ]
     pub fn napi_create_dataview(
         env: napi_env,
         length: usize,
@@ -1228,6 +1311,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_is_dataview" ]
     pub fn napi_is_dataview(
         env: napi_env,
         value: napi_value,
@@ -1235,6 +1319,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_dataview_info" ]
     pub fn napi_get_dataview_info(
         env: napi_env,
         dataview: napi_value,
@@ -1245,6 +1330,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_async_work" ]
     pub fn napi_create_async_work(
         env: napi_env,
         async_resource: napi_value,
@@ -1256,24 +1342,28 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_delete_async_work" ]
     pub fn napi_delete_async_work(
         env: napi_env,
         work: napi_async_work,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_queue_async_work" ]
     pub fn napi_queue_async_work(
         env: napi_env,
         work: napi_async_work,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_cancel_async_work" ]
     pub fn napi_cancel_async_work(
         env: napi_env,
         work: napi_async_work,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_async_init" ]
     pub fn napi_async_init(
         env: napi_env,
         async_resource: napi_value,
@@ -1282,12 +1372,14 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_async_destroy" ]
     pub fn napi_async_destroy(
         env: napi_env,
         async_context: napi_async_context,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_make_callback" ]
     pub fn napi_make_callback(
         env: napi_env,
         async_context: napi_async_context,
@@ -1299,15 +1391,18 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_version" ]
     pub fn napi_get_version(env: napi_env, result: *mut u32) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_get_node_version" ]
     pub fn napi_get_node_version(
         env: napi_env,
         version: *mut *const napi_node_version,
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_create_promise" ]
     pub fn napi_create_promise(
         env: napi_env,
         deferred: *mut napi_deferred,
@@ -1315,6 +1410,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_resolve_deferred" ]
     pub fn napi_resolve_deferred(
         env: napi_env,
         deferred: napi_deferred,
@@ -1322,6 +1418,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_reject_deferred" ]
     pub fn napi_reject_deferred(
         env: napi_env,
         deferred: napi_deferred,
@@ -1329,6 +1426,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_is_promise" ]
     pub fn napi_is_promise(
         env: napi_env,
         promise: napi_value,
@@ -1336,6 +1434,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_adjust_external_memory" ]
     pub fn napi_adjust_external_memory(
         env: napi_env,
         change_in_bytes: i64,
@@ -1343,6 +1442,7 @@ extern "C" {
     ) -> napi_status;
 }
 extern "C" {
+ # [ link_name = "\u{1}_napi_run_script" ]
     pub fn napi_run_script(
         env: napi_env,
         script: napi_value,
